@@ -7,14 +7,10 @@ Copy the files
 
 to the same directory as the one containing your main .tex file.
 
-```
-\documentclass[dutch]{ucll-exam}
-
 
 # Example
 
 See `sample` directory for full sample.
-
 
 
 ```
