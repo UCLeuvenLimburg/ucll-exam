@@ -27,10 +27,10 @@
 
 \usetikzlibrary{calc,math,shapes.multipart}
 
-
-
-
-
+\newcommand{\ifshowstudent}[1]{
+  \pgfkeys{/exam/student flag/.get=\exam@student}
+  \ifnum\exam@student=1#1\fi
+}
 
 %
 % Page header and footer
@@ -87,32 +87,35 @@
         \Huge /20\hspace{2mm}
       }
     };
-    \node[rectangle split,
-          rectangle split parts=2,
-          rectangle split horizontal=true,
-          anchor=north west,
-          draw,
-          minimum height=2cm,
-          minimum width=16.25cm] (student information) at ($ (exam information.south west) + (0,-0.2) $) {
-      \parbox[c][2cm]{5mm}{
-        \centering
-        \rotatebox{90}{\bfseries \exam@string{Student}}
-      }
-      \nodepart{two}
-      \parbox{16.04cm}{
-        \centering
-        \pgfkeys{/exam/pc flag/.get=\exam@pc}
-        \begin{tabular}{rlrl}
-          \exam@string{Name}: & \multicolumn{3}{l}{\parbox[b][8mm]{13cm}{\dotfill}} \\
-          \ifnum\exam@pc=1
-            \exam@string{First name}: & \parbox[b][8mm]{7cm}{\dotfill} & \exam@string{PC}: & \parbox[b][8mm]{4.25cm}{\dotfill} \\
-          \else
-            \exam@string{First name}: & \multicolumn{3}{l}{\parbox[b][8mm]{13cm}{\dotfill}} \\
-          \fi
-          \exam@string{Student id}: & \parbox[b][8mm]{7cm}{\dotfill} & \exam@string{Group}: & \parbox[b][8mm]{4.25cm}{\dotfill} \\
-        \end{tabular}
-      }
-    };
+    \pgfkeys{/exam/student flag/.get=\exam@student}
+    \ifshowstudent{
+      \node[rectangle split,
+            rectangle split parts=2,
+            rectangle split horizontal=true,
+            anchor=north west,
+            draw,
+            minimum height=2cm,
+            minimum width=16.25cm] (student information) at ($ (exam information.south west) + (0,-0.2) $) {
+        \parbox[c][2cm]{5mm}{
+          \centering
+          \rotatebox{90}{\bfseries \exam@string{Student}}
+        }
+        \nodepart{two}
+        \parbox{16.04cm}{
+          \centering
+          \pgfkeys{/exam/pc flag/.get=\exam@pc}
+          \begin{tabular}{rlrl}
+            \exam@string{Name}: & \multicolumn{3}{l}{\parbox[b][8mm]{13cm}{\dotfill}} \\
+            \ifnum\exam@pc=1
+              \exam@string{First name}: & \parbox[b][8mm]{7cm}{\dotfill} & \exam@string{PC}: & \parbox[b][8mm]{4.25cm}{\dotfill} \\
+            \else
+              \exam@string{First name}: & \multicolumn{3}{l}{\parbox[b][8mm]{13cm}{\dotfill}} \\
+            \fi
+            \exam@string{Student id}: & \parbox[b][8mm]{7cm}{\dotfill} & \exam@string{Group}: & \parbox[b][8mm]{4.25cm}{\dotfill} \\
+          \end{tabular}
+        }
+      };
+    }
   \end{tikzpicture}
 }
 
@@ -178,6 +181,8 @@
   duur/.store in=\exam@duur,
   pc flag/.initial=0,
   pc/.style={pc flag=1},
+  student flag/.initial=1,
+  no student/.style={student flag=0},
   ti/.style={
     opleiding={Bachelor in de Toegepaste Informatica}
   },
@@ -285,14 +290,24 @@
   \ifundef\exam@duur{
     \PackageError{ucll-exam}{Exam information: missing value duur}{Use the exam command to set all exam parameters}
   }{}
+
+  \newlength{\exam@firstpageheadheight}
+  \setlength{\exam@firstpageheadheight}{4cm}
+  \ifshowstudent{
+    \addtolength{\exam@firstpageheadheight}{3cm}
+  }
 }
 
 
 %
 % Guidelines
 %
+
+\pgfkeys{/exam/student flag/.get=\exam@student}
+\message{STUDENT=\exam@student}
+
 \newenvironment{examguidelines}{
-\newgeometry{includeheadfoot,headheight=8cm,top=2cm,bottom=1.5cm,left=2cm,right=2cm}
+\newgeometry{includeheadfoot,headheight=\exam@firstpageheadheight,top=2cm,bottom=1.5cm,left=2cm,right=2cm}
 \vspace*{\fill}
 \begin{center}
   \begin{minipage}{.95\linewidth}
